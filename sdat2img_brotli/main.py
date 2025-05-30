@@ -178,7 +178,7 @@ def convert_rom_files_function(datbr_path=None, transferlist_path=None, output_i
     br_file_name = os.path.abspath(br_file_name)
     transfer_list_name = os.path.abspath(transfer_list_name)
 
-    print(f"🚀 SDAT2IMG Brotli v1.0.2 Starting 🚀")
+    print(f"🚀 SDAT2IMG Brotli v1.0.3 Starting 🚀")
     print("----------------------------------------")
     print(f"Processing files: '{br_file_name}' and '{transfer_list_name}'")
     print(f"Output image will be: '{output_img_name}'")
