@@ -146,7 +146,7 @@ Upon successful conversion, a `.img` file (e.g., `system.img`, `vendor.img`) wil
 
 ## 🙏 Credits
 
-  * Based on [xpirt’s original sdat2img](https://gist.github.com/xpirt/2c11438a0f9077227d8905391c49926d).
+  * Based on [xpirt’s original sdat2img](https://github.com/xpirt/sdat2img).
   * Modified for Brotli compression compatibility and enhanced usability with CLI arguments.
 
 -----
