@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.dist-info/
+*.egg-info/
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg
+*.whl
+
+# C extensions
+*.so
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+.cache/
+nosetests.xml
+coverage.xml
+htmlcov/
+
+# Editor directories and files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+.project
+.settings/
+.classpath
+
+# Virtual environment
+venv/
+env/
+/bin/
+/include/
+/lib/
+/share/
+/Scripts/
+/Lib/
+/local/
+
+# OS-specific files
+.localized
+.Trashes
+thumbs.db
+desktop.ini
