@@ -1,8 +1,13 @@
 # 📦 SDAT2IMG Brotli
 
-[](https://www.google.com/url?sa=E&source=gmail&q=https://pypi.org/project/sdat2img-brotli/)
-[](https://www.google.com/url?sa=E&source=gmail&q=https://pypi.org/project/sdat2img-brotli/)
-[](https://opensource.org/licenses/MIT)
+[Original Project](https://github.com/tntapple219/sdat2img_brotli)
+
+
+[PyPI](https://pypi.org/project/sdat2img-brotli/)
+
+
+[MIT](https://opensource.org/licenses/MIT)
+
 
 This Python script extracts and converts Android OTA update files—specifically `.dat.br` (Brotli compressed) and `.transfer.list`—into a usable `.img` disk image. This is especially useful for unpacking `system`, `vendor`, or `product` partitions from A/B OTA packages.
 
