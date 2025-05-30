@@ -13,6 +13,9 @@ This Python script extracts and converts Android OTA update files—specifically
 
 ---
 ## Changelog / Release Notes
+### **v1.0.2 (2025-05-31)**
+* **Bug Fixes:**
+    * Fixed an issue where the `sdat2img-brotli` command-line tool failed to correctly parse file paths (e.g., `-d`, `-t` arguments) provided by the user. This occurred because the argument parsing logic was not executed when the tool was invoked via its console entry point. The `argparse` logic has been moved directly into the main conversion function (`convert_rom_files_function`) to ensure robust argument handling across all execution methods.
 
 ### **v1.0.1 (2025-05-31)**
 * **Improved:** Simplified library import. Users can now directly `from sdat2img_brotli import convert_rom_files_function`.

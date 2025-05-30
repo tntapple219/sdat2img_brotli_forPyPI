@@ -6,18 +6,27 @@ import argparse
 
 # --- Core logic of original sdat2img.py adapted into a single function ---
 # Source: https://gist.github.com/xpirt/2c11438a0f9077227d8905391c49926d
-# This version includes changes to integrate it into a standalone script
+# This version integrates the conversion logic into a reusable function.
 
 def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
     """
-    Executes the core logic of sdat2img.py.
-    This function processes the .dat and .transfer.list files to generate a .img file.
+    Executes the core logic of sdat2img.py to convert .dat and .transfer.list
+    files into an Android .img disk image.
+
+    Args:
+        transfer_list_file (str): Path to the .transfer.list file.
+        new_dat_file (str): Path to the decompressed .dat file.
+        output_image_file (str): Path for the output .img file.
+
+    Returns:
+        bool: True if conversion is successful, False otherwise.
     """
     print(f"sdat2img module: Starting conversion from '{new_dat_file}' to '{output_image_file}'")
 
     BLOCK_SIZE = 4096
 
     def rangeset(src):
+        """Parses a comma-separated string of block ranges."""
         src_set = src.split(',')
         num_set = [int(item) for item in src_set]
         if len(num_set) != num_set[0] + 1:
@@ -26,14 +35,15 @@ def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
         return tuple([(num_set[i], num_set[i + 1]) for i in range(1, len(num_set), 2)])
 
     def parse_transfer_list_file(path):
+        """Parses the .transfer.list file to extract version, new blocks, and commands."""
         try:
             with open(path, 'r') as trans_list:
-                version = int(trans_list.readline()) # Reads version, but it's not used for printing anymore
+                version = int(trans_list.readline())
                 new_blocks = int(trans_list.readline())
 
                 if version >= 2:
-                    trans_list.readline()  # stash entries
-                    trans_list.readline()  # stash blocks
+                    trans_list.readline()  # Skip stash entries line
+                    trans_list.readline()  # Skip stash blocks line
 
                 commands = []
                 for line in trans_list:
@@ -100,7 +110,7 @@ def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
                     output_img.write(data_read)
                     block_count -= 1
         else:
-            pass  # skip 'erase' and 'zero' commands
+            pass  # skip 'erase' and 'zero' commands for sdat2img logic
 
     if output_img.tell() < max_file_size:
         output_img.truncate(max_file_size)
@@ -114,34 +124,67 @@ def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
 def convert_rom_files_function(datbr_path=None, transferlist_path=None, output_img_name=None):
     """
     Main function to decompress .dat.br and convert to .img.
-    Can be called with specific file paths or use default behavior.
+    This function handles argument parsing internally when called as an entry point.
 
     Args:
-        datbr_path (str, optional): Path to the .dat.br file. Defaults to "system.new.dat.br".
-        transferlist_path (str, optional): Path to the .transfer.list file. Defaults to "system.transfer.list".
-        output_img_name (str, optional): Name/path for the output .img file. Defaults to "system.img".
+        datbr_path (str, optional): Path to the .dat.br file. Defaults to None.
+                                   If None, attempts to parse from command-line arguments.
+        transferlist_path (str, optional): Path to the .transfer.list file. Defaults to None.
+                                          If None, attempts to parse from command-line arguments.
+        output_img_name (str, optional): Name/path for the output .img file. Defaults to None.
+                                        If None, attempts to parse from command-line arguments.
 
     Returns:
         bool: True if conversion is successful, False otherwise.
     """
     
-    # Check Python version first, crucial for functionality
+    # Check Python version first
     if sys.version_info < (3, 6):
-        print("This script requires Python 3.6 or newer. (ಥ﹏ಥ)", file=sys.stderr)
+        print("This script requires Python 3.6 or newer.", file=sys.stderr)
         print(f"You are using Python {sys.version_info.major}.{sys.version_info.minor}.", file=sys.stderr)
-        return False # Return False as the function failed due to version mismatch
+        return False
 
-    # --- Determine file paths: Use provided arguments or defaults ---
+    # If arguments are not explicitly passed (e.g., when called as an entry point),
+    # parse them from sys.argv.
+    if datbr_path is None and transferlist_path is None and output_img_name is None:
+        parser = argparse.ArgumentParser(
+            description='✨ SDAT2IMG Brotli: Decompresses .dat.br and converts to .img file. ✨',
+            formatter_class=argparse.RawTextHelpFormatter
+        )
+        parser.add_argument('-d', '--datbr', type=str, 
+                            help='Specifies the path to the .dat.br file.\n'
+                                 'Example: -d "C:\\roms\\my_system.new.dat.br"\n'
+                                 'Default: system.new.dat.br')
+        parser.add_argument('-t', '--transferlist', type=str, 
+                            help='Specifies the path to the .transfer.list file.\n'
+                                 'Example: -t "C:\\roms\\my_system.transfer.list"\n'
+                                 'Default: system.transfer.list')
+        parser.add_argument('-o', '--outputimg', type=str, 
+                            help='Specifies the name and path for the output .img file.\n'
+                                 'Example: -o "extracted_system.img"\n'
+                                 'Default: system.img')
+        args = parser.parse_args()
+
+        datbr_path = args.datbr
+        transferlist_path = args.transferlist
+        output_img_name = args.outputimg
+        
+    # Determine file paths: Use provided arguments or defaults if still None
     br_file_name = datbr_path if datbr_path is not None else "system.new.dat.br"
     transfer_list_name = transferlist_path if transferlist_path is not None else "system.transfer.list"
     output_img_name = output_img_name if output_img_name is not None else "system.img"
     
-    print(f"🚀 SDAT2IMG Brotli v1.0.1 Starting 🚀") # Updated version number!
+    # Convert paths to absolute paths for robust file handling
+    br_file_name = os.path.abspath(br_file_name)
+    transfer_list_name = os.path.abspath(transfer_list_name)
+
+    print(f"🚀 SDAT2IMG Brotli v1.0.2 Starting 🚀")
     print("----------------------------------------")
     print(f"Processing files: '{br_file_name}' and '{transfer_list_name}'")
     print(f"Output image will be: '{output_img_name}'")
     print("----------------------------------------")
 
+    # Check file existence
     if not os.path.exists(br_file_name):
         print(f"Error: '{br_file_name}' not found. Please ensure the path is correct.", file=sys.stderr)
         return False
@@ -150,19 +193,11 @@ def convert_rom_files_function(datbr_path=None, transferlist_path=None, output_i
         print(f"Error: '{transfer_list_name}' not found. Please ensure the path is correct.", file=sys.stderr)
         return False
 
-    dat_file_path = br_file_name.replace(".br", "")
-    # Ensure the .dat file path is correctly formed, ideally in the same directory as the .dat.br.
-    # For simplicity, we assume .dat.br is the full input path and .dat will be generated in the same directory.
+    # Robustly generate the .dat file path
+    base_name_without_br = br_file_name.rsplit('.br', 1)[0] if br_file_name.endswith('.br') else br_file_name
+    dat_file_path = base_name_without_br
     if not dat_file_path.endswith(".dat"):
-        base, ext = os.path.splitext(br_file_name)
-        if ext == ".br":
-            dat_file_path = base # Remove .br
-            if not dat_file_path.endswith(".dat"): # Ensure it ends with .dat
-                dat_file_path += ".dat"
-        else:
-            # If not .br, it might already be .dat or another extension, simply append .dat suffix
-            dat_file_path = br_file_name + ".dat"
-
+        dat_file_path += ".dat"
 
     print(f"\nStep 1/2: Decompressing '{br_file_name}' to '{dat_file_path}'...")
     try:
@@ -195,10 +230,12 @@ def convert_rom_files_function(datbr_path=None, transferlist_path=None, output_i
 
 
 if __name__ == "__main__":
-    # When run as a script, we still use argparse for command-line handling
+    # When run as a script directly (e.g., `python main.py ...`),
+    # parse arguments and call the main conversion function.
+    # This block ensures compatibility when the script is not run via console_scripts.
     parser = argparse.ArgumentParser(
         description='✨ SDAT2IMG Brotli: Decompresses .dat.br and converts to .img file. ✨',
-        formatter_class=argparse.RawTextHelpFormatter # Preserve description formatting
+        formatter_class=argparse.RawTextHelpFormatter
     )
     
     parser.add_argument(
@@ -225,15 +262,15 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Display the parameters being used for CLI execution
+    # Display the parameters being used for CLI execution (when run directly)
     print("\n----------------------------------------")
-    print("🚀 Command-line arguments set:")
-    print(f"  .dat.br file: {args.datbr if args.datbr else 'Using default'}")
-    print(f"  .transfer.list file: {args.transferlist if args.transferlist else 'Using default'}")
-    print(f"  Output .img file: {args.outputimg if args.outputimg else 'Using default'}")
+    print("🚀 Command-line arguments set (from direct script execution):")
+    print(f"   .dat.br file: {args.datbr if args.datbr else 'Using default'}")
+    print(f"   .transfer.list file: {args.transferlist if args.transferlist else 'Using default'}")
+    print(f"   Output .img file: {args.outputimg if args.outputimg else 'Using default'}")
     print("----------------------------------------\n")
 
-    # Call the main function with parsed arguments (or None for defaults)
+    # Call the main function with parsed arguments
     overall_success = convert_rom_files_function(
         datbr_path=args.datbr,
         transferlist_path=args.transferlist,

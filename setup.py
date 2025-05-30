@@ -22,7 +22,7 @@ def read_requirements():
 
 setup(
     name='sdat2img-brotli', # ⚡ PyPI package name updated! Use hyphens for PyPI.
-    version='1.0.1',      # Your package version number. Increment for new releases!
+    version='1.0.2',      # Your package version number. Increment for new releases!
     author='TNTAPPLE',   # Your name or organization
     author_email='tntapple219@gmail.com', # Your email
     description='A Python tool to decompress .dat.br files and convert Android .dat/.transfer.list into .img disk images.',
