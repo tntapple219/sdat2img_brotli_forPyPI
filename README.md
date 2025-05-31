@@ -157,9 +157,8 @@ Upon successful conversion, a `.img` file (e.g., `system.img`, `vendor.img`) wil
 
 ## 🙏 Credits
 
-🔗 Based on [xpirt’s original sdat2img](https://github.com/xpirt/sdat2img), which is licensed under the MIT License.  
-🔧 Modified to support Brotli-compressed `.dat.br` files and enhanced with command-line arguments for better usability.  
-📦 Brotli support is powered by the [Google Brotli library](https://github.com/google/brotli), also licensed under the MIT License.
+- Based on [xpirt’s sdat2img](https://github.com/xpirt/sdat2img) (MIT License)
+- Includes [Google Brotli library](https://github.com/google/brotli) (MIT License)
 -----
 
 ## 📄 License
